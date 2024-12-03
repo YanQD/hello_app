@@ -1,15 +1,24 @@
-cargo build --target riscv64gc-unknown-none-elf --release
+APP1=hello_app_1
+APP2=hello_app_2
+APP=apps
 
-rust-objcopy --binary-architecture=riscv64 --strip-all -O binary target/riscv64gc-unknown-none-elf/release/hello_app ./hello_app.bin
+cd ${APP1} && ./build_bin.sh && cd ..
+cd ${APP2} && ./build_bin.sh && cd ..
 
-size=$(xxd -p ./hello_app.bin | tr -d '\n' | wc -c)
-echo "Size: $((size/2))"
+size1=$(xxd -p ./${APP1}.bin | tr -d '\n' | wc -c)
+echo "Size: $((size1/2))"
 
-dd if=/dev/zero of=./apps.bin bs=1M count=32
-printf "%02x" $((size/2)) | xxd -p -r | dd of=apps.bin conv=notrunc
-dd if=./hello_app.bin of=./apps.bin seek=1 bs=1 conv=notrunc 
+dd if=/dev/zero of=./${APP}.bin bs=1M count=32
+printf "%02x" $((size1/2)) | xxd -p -r | dd of=${APP}.bin conv=notrunc
+dd if=./${APP1}.bin of=./${APP}.bin seek=1 bs=1 conv=notrunc 
 
-xxd -l 10 -p ./apps.bin
+size2=$(xxd -p ./${APP2}.bin | tr -d '\n' | wc -c)
+echo "Size: $((size2/2))"
+
+printf "%02x" $((size2/2)) | xxd -p -r | dd of=${APP}.bin conv=notrunc seek=$((size1/2 + 1)) bs=1
+dd if=./${APP2}.bin of=./${APP}.bin seek=$((size1/2 + 2)) bs=1 conv=notrunc 
+
+xxd -l 20 -p ./${APP}.bin
 
 mkdir -p ../arceos/payload
 mv ./apps.bin ../arceos/payload/apps.bin
