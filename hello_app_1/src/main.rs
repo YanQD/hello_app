@@ -1,16 +1,49 @@
+#![feature(asm_const)]
 #![no_std]
 #![no_main]
 
-use core::panic::PanicInfo;
+const SYS_HELLO: usize = 1;
+const SYS_PUTCHAR: usize = 2;
+const SYS_TERMINATE: usize = 3;
 
 #[no_mangle]
-unsafe extern "C" fn _start() {
-    core::arch::asm!(
-        "nop",
-    )
+unsafe extern "C" fn _start() -> ! {
+    let arg0: u8 = b'C';
+    putchar(arg0);
+    exit(0);
 }
+
+use core::panic::PanicInfo;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
+}
+
+fn putchar(ch: u8) {
+    unsafe {
+        core::arch::asm!("
+        li      t0, {abi_num}
+        slli    t0, t0, 3
+        add     t1, a7, t0
+        ld      t1, (t1)
+        jalr    t1",
+        abi_num = const SYS_PUTCHAR,
+        in("a0") ch,
+    )}
+}
+
+fn exit(exit_code: u8) -> ! {
+    unsafe {
+        core::arch::asm!("
+        li      t0, {abi_num}
+        slli    t0, t0, 3
+        add     t1, a7, t0
+        ld      t1, (t1)
+        jalr    t1
+        wfi",
+        abi_num = const SYS_TERMINATE,
+        in("a0") exit_code,
+        options(noreturn),
+    )}
 }

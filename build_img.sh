@@ -12,11 +12,11 @@ dd if=/dev/zero of=./${APP}.bin bs=1M count=32
 printf "%02x" $((size1/2)) | xxd -p -r | dd of=${APP}.bin conv=notrunc
 dd if=./${APP1}.bin of=./${APP}.bin seek=1 bs=1 conv=notrunc 
 
-size2=$(xxd -p ./${APP2}.bin | tr -d '\n' | wc -c)
-echo "Size: $((size2/2))"
+# size2=$(xxd -p ./${APP2}.bin | tr -d '\n' | wc -c)
+# echo "Size: $((size2/2))"
 
-printf "%02x" $((size2/2)) | xxd -p -r | dd of=${APP}.bin conv=notrunc seek=$((size1/2 + 1)) bs=1
-dd if=./${APP2}.bin of=./${APP}.bin seek=$((size1/2 + 2)) bs=1 conv=notrunc 
+# printf "%02x" $((size2/2)) | xxd -p -r | dd of=${APP}.bin conv=notrunc seek=$((size1/2 + 1)) bs=1
+# dd if=./${APP2}.bin of=./${APP}.bin seek=$((size1/2 + 2)) bs=1 conv=notrunc 
 
 xxd -l 20 -p ./${APP}.bin
 
