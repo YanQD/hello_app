@@ -8,7 +8,7 @@ const SYS_TERMINATE: usize = 3;
 static mut ABI_ENTRY: usize = 0;
 
 #[no_mangle]
-#[link_section = ".text.entry"]
+// #[link_section = ".text.entry"]
 unsafe extern "C" fn _start(abi_entry: usize) -> ! {
     ABI_ENTRY = abi_entry;
     let arg0: u8 = b'C';
@@ -18,7 +18,7 @@ unsafe extern "C" fn _start(abi_entry: usize) -> ! {
     putchar(arg0);
     // putchar(arg1);
     sputs("ArceOS v5678!");
-    puts("ArceOS v5678!");
+    // puts("ArceOS v5678!");
     terminate(0);
     loop {}
 }
@@ -53,8 +53,7 @@ macro_rules! abi_call {
             abi_num = const $abi_num,
             in("a1") $arg0,
             clobber_abi("C"),
-            )
-        }
+        )}
     }}
 }
 

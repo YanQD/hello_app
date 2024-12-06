@@ -1,5 +1,6 @@
 APP1=hello_app_1
 APP2=hello_app_2
+APP5=hello_app_v5
 APP=apps
 
 cd ${APP1} && ./build_bin.sh && cd ..
@@ -18,7 +19,7 @@ dd if=./${APP1}.bin of=./${APP}.bin seek=2 bs=1 conv=notrunc
 # printf "%02x" $((size2/2)) | xxd -p -r | dd of=${APP}.bin conv=notrunc seek=$((size1/2 + 1)) bs=1
 # dd if=./${APP2}.bin of=./${APP}.bin seek=$((size1/2 + 2)) bs=1 conv=notrunc 
 
-xxd -l 20 -p ./${APP}.bin
+xxd -l $((size1/2)) -p ./${APP}.bin
 
 mkdir -p ../arceos/payload
 mv ./apps.bin ../arceos/payload/apps.bin
